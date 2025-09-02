@@ -248,3 +248,10 @@ if selected == "Parkinsons Prediction":
             parkinsons_diagnosis = "The person does not have Parkinson's disease"
 
     st.success(parkinsons_diagnosis)
+st.markdown("""
+    <hr style='margin-top: 50px;'>
+    <div style='text-align: center; font-size: 14px; color: gray;'>
+        Built by Subhankar | Powered by Streamlit & Machine Learning<br>
+        © 2025 Health Assistant App
+    </div>
+""", unsafe_allow_html=True)
