@@ -2,6 +2,28 @@ import os
 import pickle
 import streamlit as st
 from streamlit_option_menu import option_menu
+# Function to set background image
+import base64
+
+def get_base64(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_background(image_file):
+    bin_str = get_base64(image_file)
+    page_bg_img = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/png;base64,{bin_str}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }}
+    </style>
+    """
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
 
 # Set page configuration
 st.set_page_config(page_title="Health Assistant",
@@ -37,7 +59,7 @@ if selected == 'Diabetes Prediction':
 
     # page title
     st.title('Diabetes Prediction using ML')
-
+    set_background(f'{working_dir}/images/diabetesimg.png')
     # getting the input data from the user
     col1, col2, col3 = st.columns(3)
 
@@ -92,7 +114,7 @@ if selected == 'Heart Disease Prediction':
 
     # page title
     st.title('Heart Disease Prediction using ML')
-
+    set_background(f'{working_dir}/images/heartimg.png')
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -159,7 +181,7 @@ if selected == "Parkinsons Prediction":
 
     # page title
     st.title("Parkinson's Disease Prediction using ML")
-
+    set_background(f'{working_dir}/images/parkinsonimg.png')
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
@@ -250,7 +272,7 @@ if selected == "Parkinsons Prediction":
     st.success(parkinsons_diagnosis)
 st.markdown("""
     <hr style='margin-top: 50px;'>
-    <div style='text-align: center; font-size: 14px; color: gray;'>
+    <div style='text-align: center; font-size: 14px; color: white;'>
         Built by Subhankar | Powered by Streamlit & Machine Learning<br>
         © 2025 Health Assistant App
     </div>
