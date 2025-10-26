@@ -43,7 +43,21 @@ if st.session_state.page == "landing":
     
     set_background(f'{working_dir}/images/landingimg.png')
 
-    st.markdown("<br><br><br>", unsafe_allow_html=True)  # Adjust the number of <br> as needed
+    st.markdown("""
+    <style>
+    @media (max-width: 480px){ .landing-spacer{height:65vh;} }
+    @media (min-width: 481px) and (max-width: 1024px){ .landing-spacer{height:45vh;} }
+    @media (min-width: 1025px){ .landing-spacer{height:28vh;} }
+    /* make button more visible on image */
+    .stButton>button {
+        background-color: rgba(255,255,255,0.9) !important;
+        color: #000 !important;
+        border-radius: 8px;
+        padding: 8px 18px;
+    }
+    </style>
+    <div class="landing-spacer"></div>
+    """, unsafe_allow_html=True)  # landing page adjusted for mobile view
 
     if st.button("Next"):
         st.session_state.page = "predict"
