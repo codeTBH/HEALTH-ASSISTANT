@@ -1,6 +1,7 @@
 import os
 import pickle
 import streamlit as st
+import numpy as np
 from streamlit_option_menu import option_menu
 # Function to set background image
 import base64
@@ -139,13 +140,30 @@ elif st.session_state.page == "predict":
             user_input = [float(x) for x in user_input]
 
             diab_prediction = diabetes_model.predict([user_input])
+            #get probability of prediction
+            diab_prediction_proba = diabetes_model.decision_function([user_input])
+            risk_percentage = 1 / (1 + np.exp(-diab_prediction_proba[0])) * 100  # Convert to percentage using sigmoid function
+
+            #determine risk level based on probability
+            if risk_percentage < 40:
+                risk_level = 'Low'
+            elif risk_percentage < 70:
+                risk_level = 'Medium'
+            else:
+                risk_level = 'High'
+
+#diagnosis message with risk percentage and level       
 
             if diab_prediction[0] == 1:
                 diab_diagnosis = 'The person is diabetic'
             else:
                 diab_diagnosis = 'The person is not diabetic'
 
-        st.success(diab_diagnosis)
+            st.success(diab_diagnosis)
+            #show risk information  
+            st.info(f'Risk Percentage: {risk_percentage:.2f}%')
+            st.warning(f'Risk Level: {risk_level}')
+
 
     # Heart Disease Prediction Page
     if selected == 'Heart Disease Prediction':
@@ -211,13 +229,27 @@ elif st.session_state.page == "predict":
             user_input = [float(x) for x in user_input]
 
             heart_prediction = heart_disease_model.predict([user_input])
+            #get probability of prediction
+            heart_prediction_proba = heart_disease_model.predict_proba([user_input])
+            risk_percentage = heart_prediction_proba[0][1] * 100
 
+            #determine risk level based on probability
+            if risk_percentage < 40:
+                risk_level = 'Low'
+            elif risk_percentage < 70:
+                risk_level = 'Medium'
+            else:
+                risk_level = 'High'
+#diagnosis message with risk percentage and level
             if heart_prediction[0] == 1:
                 heart_diagnosis = 'The person is having heart disease'
             else:
                 heart_diagnosis = 'The person does not have any heart disease'
 
-        st.success(heart_diagnosis)
+            st.success(heart_diagnosis)
+            #show risk information
+            st.info(f'Risk Percentage: {risk_percentage:.2f}%') 
+            st.warning(f'Risk Level: {risk_level}')
 
     # Parkinson's Prediction Page
     if selected == "Parkinsons Prediction":
@@ -228,7 +260,7 @@ elif st.session_state.page == "predict":
         # patient information
         st.subheader("Patient Information")
         patient_name = st.text_input("Patient Name", key="parkinsons_patient_name")
-        
+
         col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
@@ -310,13 +342,28 @@ elif st.session_state.page == "predict":
             user_input = [float(x) for x in user_input]
 
             parkinsons_prediction = parkinsons_model.predict([user_input])
+            #get probability of prediction
+            parkinsons_prediction_proba = parkinsons_model.decision_function([user_input])
+            risk_percentage = 1 / (1 + np.exp(-parkinsons_prediction_proba[0])) * 100  # Convert to percentage using sigmoid function
 
+            #determine risk level based on probability
+            if risk_percentage < 40:
+                risk_level = 'Low'
+            elif risk_percentage < 70:
+                risk_level = 'Medium'
+            else:
+                risk_level = 'High'
+ #diagnosis message with risk percentage and level
             if parkinsons_prediction[0] == 1:
                 parkinsons_diagnosis = "The person has Parkinson's disease"
             else:
                 parkinsons_diagnosis = "The person does not have Parkinson's disease"
 
-        st.success(parkinsons_diagnosis)
+            st.success(parkinsons_diagnosis)
+            #show risk information  
+            st.info(f'Risk Percentage: {risk_percentage:.2f}%')
+            st.warning(f'Risk Level: {risk_level}')
+
     st.markdown("""
         <hr style='margin-top: 50px;'>
         <div style='text-align: center; font-size: 14px; color: white;'>
