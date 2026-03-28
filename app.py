@@ -95,6 +95,9 @@ elif st.session_state.page == "predict":
         # page title
         st.title('Diabetes Prediction using ML')
         set_background(f'{working_dir}/images/diabetesimg.png')
+        #patient information
+        st.subheader("Patient Information")
+        patient_name = st.text_input("Patient Name",key="diabetes_patient_name")
         # getting the input data from the user
         col1, col2, col3 = st.columns(3)
 
@@ -150,6 +153,11 @@ elif st.session_state.page == "predict":
         # page title
         st.title('Heart Disease Prediction using ML')
         set_background(f'{working_dir}/images/heartimg.png')
+
+        # patient information
+        st.subheader("Patient Information")
+        patient_name = st.text_input("Patient Name", key="heart_patient_name")
+
         col1, col2, col3 = st.columns(3)
 
         with col1:
@@ -217,6 +225,10 @@ elif st.session_state.page == "predict":
         # page title
         st.title("Parkinson's Disease Prediction using ML")
         set_background(f'{working_dir}/images/parkinsonimg.png')
+        # patient information
+        st.subheader("Patient Information")
+        patient_name = st.text_input("Patient Name", key="parkinsons_patient_name")
+        
         col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
