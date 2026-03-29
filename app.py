@@ -6,6 +6,80 @@ from streamlit_option_menu import option_menu
 # Function to set background image
 import base64
 
+#recomendation function to provide lifestyle recommendations based on risk level
+def get_recommendations(disease, risk_level):
+     if disease == "Diabetes":
+
+        if risk_level == "High":
+            return [
+                "Consult a physician immediately",
+                "Reduce sugar and carbohydrate intake",
+                "Exercise at least 30 minutes daily",
+                "Monitor blood glucose regularly"
+            ]
+
+        elif risk_level == "Medium":
+            return [
+                "Maintain a balanced diet",
+                "Increase physical activity",
+                "Monitor blood sugar periodically"
+            ]
+
+        else:
+            return [
+                "Maintain healthy lifestyle",
+                "Regular health checkups",
+                "Continue balanced nutrition"
+            ]
+
+     elif disease == "Heart Disease":
+
+        if risk_level == "High":
+            return [
+                "Seek cardiologist consultation",
+                "Reduce salt and fatty foods",
+                "Avoid smoking and alcohol",
+                "Monitor blood pressure regularly"
+            ]
+
+        elif risk_level == "Medium":
+            return [
+                "Adopt heart-healthy diet",
+                "Exercise regularly",
+                "Manage stress levels"
+            ]
+
+        else:
+            return [
+                "Maintain healthy weight",
+                "Regular cardiovascular exercise",
+                "Annual heart screening"
+            ]
+
+     elif disease == "Parkinsons":
+
+        if risk_level == "High":
+            return [
+                "Consult neurologist",
+                "Start physiotherapy exercises",
+                "Maintain medication schedule",
+                "Ensure fall safety measures"
+            ]
+
+        elif risk_level == "Medium":
+            return [
+                "Practice balance exercises",
+                "Maintain regular sleep routine",
+                "Monitor motor symptoms"
+            ]
+
+        else:
+            return [
+                "Stay physically active",
+                "Maintain healthy diet",
+                "Routine neurological checkups"
+            ]
+
 def get_base64(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
@@ -163,6 +237,12 @@ elif st.session_state.page == "predict":
             #show risk information  
             st.info(f'Risk Percentage: {risk_percentage:.2f}%')
             st.warning(f'Risk Level: {risk_level}')
+#get recommendations based on risk level
+            recommendations = get_recommendations("Diabetes", risk_level)
+            st.subheader("Recommendations")
+            for rec in recommendations:
+                st.write(f"- {rec}")
+
 
 
     # Heart Disease Prediction Page
@@ -250,6 +330,12 @@ elif st.session_state.page == "predict":
             #show risk information
             st.info(f'Risk Percentage: {risk_percentage:.2f}%') 
             st.warning(f'Risk Level: {risk_level}')
+#get recommendations based on risk level
+            recommendations = get_recommendations("Heart Disease", risk_level)
+            st.subheader("Recommendations")
+            for rec in recommendations:
+                st.write(f"- {rec}")
+
 
     # Parkinson's Prediction Page
     if selected == "Parkinsons Prediction":
@@ -363,6 +449,11 @@ elif st.session_state.page == "predict":
             #show risk information  
             st.info(f'Risk Percentage: {risk_percentage:.2f}%')
             st.warning(f'Risk Level: {risk_level}')
+#get recommendations based on risk level
+            recommendations = get_recommendations("Parkinsons", risk_level)
+            st.subheader("Recommendations")
+            for rec in recommendations:
+                st.write(f"- {rec}")
 
     st.markdown("""
         <hr style='margin-top: 50px;'>
