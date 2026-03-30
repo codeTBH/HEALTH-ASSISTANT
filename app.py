@@ -166,9 +166,10 @@ elif st.session_state.page == "predict":
                             ['Diabetes Prediction',
                                 'Heart Disease Prediction',
                                 'Parkinsons Prediction',
-                                'Patient History'],
+                                'Patient History',
+                                'Analytics Dashboard'],
                             menu_icon='hospital-fill',
-                            icons=['activity', 'heart', 'person', 'clock-history'],
+                            icons=['activity', 'heart', 'person', 'clock-history', 'bar-chart-line'],
                             default_index=0)
 
 
@@ -503,7 +504,97 @@ elif st.session_state.page == "predict":
             )
         else:
             st.warning("No records found.")
-            
+    # Analytics Dashboard Page
+    if selected == "Analytics Dashboard":
+        st.title("Analytics Dashboard")
+        records = get_all_records()
+
+        if records:
+            df = pd.DataFrame(
+                records,
+                columns=[
+                    "Patient ID",
+                    "Patient Name",
+                    "Disease",
+                    "Result",
+                    "Risk %",
+                    "Risk Level",
+                    "Date & Time"
+                ]
+            )
+
+            # Convert datetime
+            df["Date & Time"] = pd.to_datetime(df["Date & Time"])
+
+            # -----------------------------
+            # Metrics
+            # -----------------------------
+
+            total_records = len(df)
+
+            unique_patients = df["Patient Name"].nunique()
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.metric("Total Records", total_records)
+
+            with col2:
+                st.metric("Unique Patients", unique_patients)
+
+            st.markdown("---")
+
+            # -----------------------------
+            # Disease Distribution
+            # -----------------------------
+
+            st.subheader("Disease Distribution")
+
+            disease_visits = df["Disease"].value_counts()
+
+            disease_unique = (
+                df.groupby("Disease")["Patient Name"]
+                .nunique()
+            )
+
+            st.write("Visits per Disease")
+
+            st.bar_chart(disease_visits)
+
+            st.write("Unique Patients per Disease")
+
+            st.bar_chart(disease_unique)
+
+            st.markdown("---")
+
+            # -----------------------------
+            # Risk Level Distribution
+            # -----------------------------
+
+            st.subheader("Risk Level Distribution")
+
+            risk_counts = df["Risk Level"].value_counts()
+
+            st.bar_chart(risk_counts)
+
+            st.markdown("---")
+
+            # -----------------------------
+            # Monthly Visits Trend
+            # -----------------------------
+
+            st.subheader("Monthly Visits Trend")
+
+            df["Month"] = df["Date & Time"].dt.to_period("M")
+
+            monthly_visits = df.groupby("Month").size()
+
+            monthly_visits.index = monthly_visits.index.astype(str)
+
+            st.line_chart(monthly_visits)
+        else:
+            st.warning("No records available for analytics.")      
+
     st.markdown("""
         <hr style='margin-top: 50px;'>
         <div style='text-align: center; font-size: 14px; color: white;'>
