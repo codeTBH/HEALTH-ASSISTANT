@@ -6,6 +6,7 @@ import pandas as pd
 from streamlit_option_menu import option_menu
 # Function to set background image
 import base64
+from utils import calculate_risk_percent, determine_risk_level
 # Importing database functions
 from database import init_db, save_prediction, get_all_records 
 
@@ -167,9 +168,10 @@ elif st.session_state.page == "predict":
                                 'Heart Disease Prediction',
                                 'Parkinsons Prediction',
                                 'Patient History',
-                                'Analytics Dashboard'],
+                                'Analytics Dashboard',
+                                'Batch Prediction'],
                             menu_icon='hospital-fill',
-                            icons=['activity', 'heart', 'person', 'clock-history', 'bar-chart-line'],
+                            icons=['activity', 'heart', 'person', 'clock-history', 'bar-chart-line','upload'],
                             default_index=0)
 
 
@@ -594,6 +596,83 @@ elif st.session_state.page == "predict":
             st.line_chart(monthly_visits)
         else:
             st.warning("No records available for analytics.")      
+    # Batch Prediction Page
+    if selected == "Batch Prediction":
+        st.title("Batch Prediction")
+        disease_type = st.selectbox("Select Disease Type for Batch Prediction", ["Diabetes", "Heart Disease", "Parkinsons"])
+        uploaded_file = st.file_uploader("Upload CSV file with patient data", type=["csv"])
+        if uploaded_file is not None:
+            try:
+                batch_df = pd.read_csv(uploaded_file)
+                st.write("Preview of Uploaded Data")
+                st.dataframe(batch_df.head())
+
+                if st.button("Run Batch Prediction"):
+                    success_count = 0
+                    results = []
+                    for _, row in batch_df.iterrows():
+                        try:
+                            if disease_type == "Diabetes":
+                                user_input = [
+                                    row['Pregnancies'], row['Glucose'], row['BloodPressure'], row['SkinThickness'],
+                                    row['Insulin'], row['BMI'], row['DiabetesPedigreeFunction'], row['Age']
+                                ]
+                                user_input = [float(x) for x in user_input]
+                                prediction = diabetes_model.predict([user_input])[0]
+                                prediction_proba = diabetes_model.decision_function([user_input])
+                                risk_percentage = calculate_risk_percent(prediction_proba)
+                                risk_level = determine_risk_level(risk_percentage)
+                                disease= "Diabetes"
+                            elif disease_type == "Heart Disease":
+                                user_input = [
+                                    row['age'], row['sex'], row['cp'], row['trestbps'], row['chol'], row['fbs'], row['restecg'],
+                                    row['thalach'], row['exang'], row['oldpeak'], row['slope'], row['ca'], row['thal']
+                                ]
+                                user_input = [float(x) for x in user_input]
+                                prediction = heart_disease_model.predict([user_input])[0]
+                                prediction_proba = heart_disease_model.decision_function([user_input])
+                                risk_percentage = calculate_risk_percent(prediction_proba)
+                                risk_level = determine_risk_level(risk_percentage)
+                                disease= "Heart Disease"
+                            else: # Parkinsons
+                                user_input = [
+                                    row['fo'], row['fhi'], row['flo'], row['Jitter_percent'], row['Jitter_Abs'],
+                                    row['RAP'], row['PPQ'], row['DDP'], row['Shimmer'], row['Shimmer_dB'],
+                                    row['APQ3'], row['APQ5'], row['APQ'], row['DDA'], row['NHR'],
+                                    row['HNR'], row['RPDE'], row['DFA'], row['spread1'], row['spread2'],
+                                    row['D2'], row['PPE']
+                                ]
+                                user_input = [float(x) for x in user_input]
+                                prediction = parkinsons_model.predict([user_input])[0]
+                                prediction_proba = parkinsons_model.decision_function([user_input])
+                                risk_percentage = calculate_risk_percent(prediction_proba)
+                                risk_level = determine_risk_level(risk_percentage)
+                                disease= "Parkinsons"
+                            #result
+                            result = "Positive" if prediction == 1 else "Negative" 
+                            #save to database
+                            save_prediction(row['Patient Name'], disease, result, risk_percentage, risk_level)   
+                            #store for display
+                            results.append({
+                                "Patient Name": row['Patient Name'],
+                                "Disease": disease,
+                                "Result": result,
+                                "Risk %": risk_percentage,
+                                "Risk Level": risk_level
+                            })
+                            success_count += 1
+                        except Exception as e:
+                            st.error(f"Error processing row for patient {row.get('patient_name', 'Unknown')}: {e}")
+                            continue
+                    
+                    # display results
+                    if results:
+                        results_df = pd.DataFrame(results)
+                        st.subheader("Batch Prediction Results")
+                        st.dataframe(results_df)
+                        st.success(f"Batch prediction completed with {success_count} successful predictions.")
+            except Exception as e:
+                st.error(f"Unexpected error occurred: {e}")
 
     st.markdown("""
         <hr style='margin-top: 50px;'>
