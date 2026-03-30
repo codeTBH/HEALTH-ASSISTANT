@@ -2,11 +2,12 @@ import os
 import pickle
 import streamlit as st
 import numpy as np
+import pandas as pd
 from streamlit_option_menu import option_menu
 # Function to set background image
 import base64
 # Importing database functions
-from database import init_db, save_prediction 
+from database import init_db, save_prediction, get_all_records 
 
 #recomendation function to provide lifestyle recommendations based on risk level
 def get_recommendations(disease, risk_level):
@@ -164,9 +165,10 @@ elif st.session_state.page == "predict":
 
                             ['Diabetes Prediction',
                                 'Heart Disease Prediction',
-                                'Parkinsons Prediction'],
+                                'Parkinsons Prediction',
+                                'Patient History'],
                             menu_icon='hospital-fill',
-                            icons=['activity', 'heart', 'person'],
+                            icons=['activity', 'heart', 'person', 'clock-history'],
                             default_index=0)
 
 
@@ -466,7 +468,33 @@ elif st.session_state.page == "predict":
             st.subheader("Recommendations")
             for rec in recommendations:
                 st.write(f"- {rec}")
+    # Patient History Page
+    if selected == "Patient History":
+        st.title("Patient Prediction History")
+        #set_background(f'{working_dir}/images/historyimg.png')
+        records = get_all_records()
+        #search box
+        search_term = st.text_input("Search by Patient Name or Disease")
 
+        if records:
+            df = pd.DataFrame(
+                records,
+                columns=[
+                    "Patient ID",
+                    "Patient Name",
+                    "Disease",
+                    "Result",
+                    "Risk %",
+                    "Risk Level",
+                    "Date & Time"
+                ]
+            )
+            if search_term:
+                df = df[df["Patient Name"].str.contains(search_term, case=False, na=False) | df["Disease"].str.contains(search_term, case=False, na=False)]
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.warning("No records found.")
+            
     st.markdown("""
         <hr style='margin-top: 50px;'>
         <div style='text-align: center; font-size: 14px; color: white;'>

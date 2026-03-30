@@ -27,8 +27,7 @@ def init_db():
 
     conn.commit()
     conn.close()
-
-    #function to save prediction result to database
+ #function to save prediction result to database
 def save_prediction(patient_name, disease, result, risk_percent, risk_level):
     conn = sqlite3.connect('health_prediction.db')
     cursor = conn.cursor()
@@ -42,4 +41,17 @@ def save_prediction(patient_name, disease, result, risk_percent, risk_level):
 
     conn.commit()
     conn.close()
+ #function to fetch all predictions from database
+def get_all_records():
+    conn = sqlite3.connect('health_prediction.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+                    SELECT * FROM predictions
+                    ORDER BY patient_id DESC
+                   """)
+    records = cursor.fetchall()
+
+    conn.close()
+    return records
        
