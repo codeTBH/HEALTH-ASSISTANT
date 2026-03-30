@@ -106,9 +106,50 @@ def set_background(image_file):
 working_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Set page configuration
-st.set_page_config(page_title="Health Assistant",
+st.set_page_config(page_title="Health Assistant 2.0",
                    layout="wide",
                    page_icon="🧑‍⚕️")
+st.markdown("""
+<style>
+
+/* Main background overlay */
+.stApp {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Card styling */
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Buttons */
+.stButton > button {
+    border-radius: 10px;
+    height: 3em;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Metrics */
+[data-testid="stMetric"] {
+    background-color: rgba(255,255,255,0.09);
+    padding: 15px;
+    border-radius: 12px;
+}
+
+/* Dataframes */
+.stDataFrame {
+    border-radius: 10px;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # Initialize the database
 init_db()
@@ -118,33 +159,73 @@ if "page" not in st.session_state:
     st.session_state.page = "landing"
 
 if st.session_state.page == "landing":
-    # st.title("🧠 Welcome to Health Assistant")
-    # st.markdown("""
-    #     This app helps clinicians predict Diabetes, Heart Disease, and Parkinson’s using machine learning.
-    #     Please proceed to enter patient data and get diagnostic insights.
-    # """)
-    
+
     set_background(f'{working_dir}/images/landingimg.png')
 
     st.markdown("""
-    <style>
-    @media (max-width: 480px){ .landing-spacer{height:65vh;} }
-    @media (min-width: 481px) and (max-width: 1024px){ .landing-spacer{height:45vh;} }
-    @media (min-width: 1025px){ .landing-spacer{height:28vh;} }
-    /* make button more visible on image */
-    .stButton>button {
-        background-color: rgba(255,255,255,0.9) !important;
-        color: #000 !important;
-        border-radius: 8px;
-        padding: 8px 18px;
+<style>
+
+/* Smooth page fade */
+.stApp {
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+/* Push button to bottom of screen */
+.landing-bottom {
+    position: fixed;
+    bottom: 0px;
+    margin-bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    text-align: center;
+}
+
+/* Modern animated button */
+.stButton > button {
+    background-color: #00c6ff;
+    color: black;
+    font-size: 20px;
+    padding: 12px 30px;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+
+    /* Strong pulse animation */
+    animation: pulse 1.8s infinite;
+}
+
+/* Hover effect */
+.stButton > button:hover {
+    transform: scale(1.1);
+}
+
+/* Animations */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255,255,255,0.9);
     }
-    </style>
-    <div class="landing-spacer"></div>
-    """, unsafe_allow_html=True)  # landing page adjusted for mobile view
+    70% {
+        box-shadow: 0 0 0 18px rgba(255,255,255,0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255,255,255,0);
+    }
+}
 
-    if st.button("Next"):
+</style>
+""", unsafe_allow_html=True)
+    st.markdown('<div class="landing-bottom">', unsafe_allow_html=True)
+    if st.button("Next →"):
         st.session_state.page = "predict"
-
+    st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
 
 elif st.session_state.page == "predict":
@@ -244,10 +325,24 @@ elif st.session_state.page == "predict":
             else:
                 diab_diagnosis = 'The person is not diabetic'
 
-            st.success(diab_diagnosis)
-            #show risk information  
-            st.info(f'Risk Percentage: {risk_percentage:.2f}%')
-            st.warning(f'Risk Level: {risk_level}')
+            st.markdown(f"""
+<div style="
+    background-color: rgba(27, 94, 32, 1);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+">
+
+<h3>Prediction Result</h3>
+
+<b>Patient:</b> {patient_name} <br>
+<b>Disease:</b> Diabetes <br>
+<b>Result:</b> {diab_diagnosis} <br>
+<b>Risk Percentage:</b> {risk_percentage:.2f}% <br>
+<b>Risk Level:</b> {risk_level}
+
+</div>
+""", unsafe_allow_html=True)
  #save prediction result to database
             save_prediction(patient_name, "Diabetes", diab_diagnosis, risk_percentage, risk_level)
 #get recommendations based on risk level
@@ -339,10 +434,24 @@ elif st.session_state.page == "predict":
             else:
                 heart_diagnosis = 'The person does not have any heart disease'
 
-            st.success(heart_diagnosis)
-#show risk information
-            st.info(f'Risk Percentage: {risk_percentage:.2f}%') 
-            st.warning(f'Risk Level: {risk_level}')
+            st.markdown(f"""
+<div style="
+    background-color: rgba(27, 94, 32, 1);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+">
+
+<h3>Prediction Result</h3>
+
+<b>Patient:</b> {patient_name} <br>
+<b>Disease:</b> Heart Disease <br>
+<b>Result:</b> {heart_diagnosis} <br>
+<b>Risk Percentage:</b> {risk_percentage:.2f}% <br>
+<b>Risk Level:</b> {risk_level}
+
+</div>
+""", unsafe_allow_html=True)
 #save prediction result to database
             save_prediction(patient_name, "Heart Disease", heart_diagnosis, risk_percentage, risk_level)
 #get recommendations based on risk level
@@ -460,10 +569,24 @@ elif st.session_state.page == "predict":
             else:
                 parkinsons_diagnosis = "The person does not have Parkinson's disease"
 
-            st.success(parkinsons_diagnosis)
-#show risk information  
-            st.info(f'Risk Percentage: {risk_percentage:.2f}%')
-            st.warning(f'Risk Level: {risk_level}')
+            st.markdown(f"""
+<div style="
+    background-color: rgba(27, 94, 32, 1);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+">
+
+<h3>Prediction Result</h3>
+
+<b>Patient:</b> {patient_name} <br>
+<b>Disease:</b> Parkinson's Disease <br>
+<b>Result:</b> {parkinsons_diagnosis} <br>
+<b>Risk Percentage:</b> {risk_percentage:.2f}% <br>
+<b>Risk Level:</b> {risk_level}
+
+</div>
+""", unsafe_allow_html=True)
 #save prediction result to database
             save_prediction(patient_name, "Parkinsons", parkinsons_diagnosis, risk_percentage, risk_level)
 #get recommendations based on risk level
@@ -678,6 +801,6 @@ elif st.session_state.page == "predict":
         <hr style='margin-top: 50px;'>
         <div style='text-align: center; font-size: 14px; color: white;'>
             Built by Subhankar | Powered by Streamlit & Machine Learning<br>
-            © 2025 Health Assistant App
+            © 2026 Health Assistant App 2.0
         </div>
     """, unsafe_allow_html=True)
