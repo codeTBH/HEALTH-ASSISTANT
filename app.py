@@ -489,9 +489,18 @@ elif st.session_state.page == "predict":
                     "Date & Time"
                 ]
             )
+            df["Date & Time"] = pd.to_datetime(df["Date & Time"]).dt.strftime("%Y-%m-%d %H:%M:%S")
             if search_term:
                 df = df[df["Patient Name"].str.contains(search_term, case=False, na=False) | df["Disease"].str.contains(search_term, case=False, na=False)]
             st.dataframe(df, use_container_width=True)
+            #download button for history
+            csv = df.to_csv(index=False)
+            st.download_button(
+                label="Download History as CSV",
+                data=csv,
+                file_name='patient_history.csv',
+                mime='text/csv',
+            )
         else:
             st.warning("No records found.")
             
