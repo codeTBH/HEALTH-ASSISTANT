@@ -5,6 +5,8 @@ import numpy as np
 from streamlit_option_menu import option_menu
 # Function to set background image
 import base64
+# Importing database functions
+from database import init_db, save_prediction 
 
 #recomendation function to provide lifestyle recommendations based on risk level
 def get_recommendations(disease, risk_level):
@@ -105,6 +107,10 @@ working_dir = os.path.dirname(os.path.abspath(__file__))
 st.set_page_config(page_title="Health Assistant",
                    layout="wide",
                    page_icon="🧑‍⚕️")
+
+# Initialize the database
+init_db()
+
 
 if "page" not in st.session_state:
     st.session_state.page = "landing"
@@ -237,6 +243,8 @@ elif st.session_state.page == "predict":
             #show risk information  
             st.info(f'Risk Percentage: {risk_percentage:.2f}%')
             st.warning(f'Risk Level: {risk_level}')
+ #save prediction result to database
+            save_prediction(patient_name, "Diabetes", diab_diagnosis, risk_percentage, risk_level)
 #get recommendations based on risk level
             recommendations = get_recommendations("Diabetes", risk_level)
             st.subheader("Recommendations")
@@ -327,9 +335,11 @@ elif st.session_state.page == "predict":
                 heart_diagnosis = 'The person does not have any heart disease'
 
             st.success(heart_diagnosis)
-            #show risk information
+#show risk information
             st.info(f'Risk Percentage: {risk_percentage:.2f}%') 
             st.warning(f'Risk Level: {risk_level}')
+#save prediction result to database
+            save_prediction(patient_name, "Heart Disease", heart_diagnosis, risk_percentage, risk_level)
 #get recommendations based on risk level
             recommendations = get_recommendations("Heart Disease", risk_level)
             st.subheader("Recommendations")
@@ -446,9 +456,11 @@ elif st.session_state.page == "predict":
                 parkinsons_diagnosis = "The person does not have Parkinson's disease"
 
             st.success(parkinsons_diagnosis)
-            #show risk information  
+#show risk information  
             st.info(f'Risk Percentage: {risk_percentage:.2f}%')
             st.warning(f'Risk Level: {risk_level}')
+#save prediction result to database
+            save_prediction(patient_name, "Parkinsons", parkinsons_diagnosis, risk_percentage, risk_level)
 #get recommendations based on risk level
             recommendations = get_recommendations("Parkinsons", risk_level)
             st.subheader("Recommendations")
