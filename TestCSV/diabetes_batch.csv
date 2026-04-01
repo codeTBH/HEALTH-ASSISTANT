@@ -1,0 +1,4 @@
+Patient Name,Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age
+Rahul,2,120,70,20,85,28.5,0.45,45
+Amit,1,150,80,25,90,32.0,0.60,50
+Priya,3,130,75,22,88,29.0,0.50,40
